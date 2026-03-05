@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My To Do List</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: #f0ede8;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 680px;
+        margin: 40px auto;
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      .header {
+        background: #e8563a;
+        padding: 28px 24px 20px;
+      }
+
+      .header h1 {
+        font-family: "Playfair Display", serif;
+        color: #fff;
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 16px;
+        letter-spacing: 0.5px;
+      }
+
+      .add-row {
+        display: flex;
+        gap: 0;
+      }
+
+      .add-row input[type="text"] {
+        flex: 1;
+        padding: 12px 16px;
+        font-size: 1rem;
+        font-family: "DM Sans", sans-serif;
+        border: none;
+        outline: none;
+        border-radius: 2px 0 0 2px;
+        color: #333;
+      }
+
+      .add-row input[type="text"]::placeholder {
+        color: #aaa;
+      }
+
+      .add-row button {
+        padding: 12px 28px;
+        background: #ccc;
+        border: none;
+        font-size: 1rem;
+        font-family: "DM Sans", sans-serif;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 0 2px 2px 0;
+        transition: background 0.2s;
+        color: #333;
+      }
+
+      .add-row button:hover {
+        background: #bbb;
+      }
+
+      .search-bar {
+        background: #fff;
+        padding: 12px 24px;
+        border-bottom: 1px solid #e5e0d8;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-bar svg {
+        color: #aaa;
+        flex-shrink: 0;
+      }
+
+      .search-bar input[type="text"] {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 0.95rem;
+        font-family: "DM Sans", sans-serif;
+        color: #444;
+        background: transparent;
+      }
+
+      .search-bar input::placeholder {
+        color: #bbb;
+      }
+
+      .list-body {
+        background: #fff;
+      }
+
+      .todo-item {
+        display: flex;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid #ece8e2;
+        transition: background 0.15s;
+        animation: fadeIn 0.25s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .todo-item:nth-child(even) {
+        background: #f7f4f0;
+      }
+      .todo-item:nth-child(even):hover {
+        background: #f0ece6;
+      }
+      .todo-item:nth-child(odd):hover {
+        background: #f7f4f0;
+      }
+
+      .todo-item.done .todo-text {
+        text-decoration: line-through;
+        color: #bbb;
+      }
+
+      .todo-text {
+        flex: 1;
+        font-size: 1rem;
+        color: #222;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .delete-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: #aaa;
+        cursor: pointer;
+        padding: 0 0 0 16px;
+        line-height: 1;
+        transition: color 0.2s;
+      }
+
+      .delete-btn:hover {
+        color: #e8563a;
+      }
+
+      .empty-state {
+        padding: 40px 24px;
+        text-align: center;
+        color: #bbb;
+        font-size: 0.95rem;
+        display: none;
+      }
+
+      .count-bar {
+        background: #fff;
+        padding: 8px 24px;
+        font-size: 0.82rem;
+        color: #aaa;
+        border-top: 1px solid #ece8e2;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .count-bar span {
+        font-weight: 500;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>My To Do List</h1>
+        <div class="add-row">
+          <input type="text" id="newTaskInput" placeholder="Title..." />
+          <button onclick="addTask()">Add</button>
+        </div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-bar">
+        <svg
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search tasks..."
+          oninput="filterTasks()"
+        />
+      </div>
+
+      <!-- LIST -->
+      <div class="list-body" id="todoList"></div>
+
+      <div class="empty-state" id="emptyState">No tasks found</div>
+
+      <!-- FOOTER COUNT -->
+      <div class="count-bar">
+        <span id="totalCount">0 tasks</span>
+        <span id="doneCount">0 done</span>
+      </div>
+    </div>
+
+    <script>
+      const defaultTasks = [
+        "Hit the gym",
+        "Pay bills",
+        "Meet George",
+        "Buy eggs",
+        "Read a book",
+      ];
+      const list = document.getElementById("todoList");
+      const emptyState = document.getElementById("emptyState");
+
+      defaultTasks.forEach((t) => createItem(t));
+      updateCount();
+
+      function addTask() {
+        const input = document.getElementById("newTaskInput");
+        const text = input.value.trim();
+        if (!text) return;
+        createItem(text);
+        input.value = "";
+        updateCount();
+        document.getElementById("searchInput").value = "";
+        filterTasks();
+      }
+
+      document
+        .getElementById("newTaskInput")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") addTask();
+        });
+
+      function createItem(text) {
+        const div = document.createElement("div");
+        div.className = "todo-item";
+
+        const span = document.createElement("span");
+        span.className = "todo-text";
+        span.textContent = text;
+        span.title = "Click to mark done";
+        span.addEventListener("click", () => {
+          div.classList.toggle("done");
+          updateCount();
+        });
+
+        const btn = document.createElement("button");
+        btn.className = "delete-btn";
+        btn.innerHTML = "&times;";
+        btn.title = "Delete task";
+        btn.addEventListener("click", () => {
+          div.remove();
+          updateCount();
+          checkEmpty();
+        });
+
+        div.appendChild(span);
+        div.appendChild(btn);
+        list.appendChild(div);
+        checkEmpty();
+      }
+
+      function filterTasks() {
+        const query = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const items = list.querySelectorAll(".todo-item");
+        let visible = 0;
+
+        items.forEach((item) => {
+          const text = item
+            .querySelector(".todo-text")
+            .textContent.toLowerCase();
+          if (text.includes(query)) {
+            item.style.display = "";
+            visible++;
+          } else {
+            item.style.display = "none";
+          }
+        });
+
+        emptyState.style.display = visible === 0 ? "block" : "none";
+      }
+
+      function updateCount() {
+        const all = list.querySelectorAll(".todo-item");
+        const done = list.querySelectorAll(".todo-item.done");
+        document.getElementById("totalCount").textContent =
+          `${all.length} task${all.length !== 1 ? "s" : ""}`;
+        document.getElementById("doneCount").textContent =
+          `${done.length} done`;
+      }
+
+      function checkEmpty() {
+        const query = document.getElementById("searchInput").value;
+        if (!query) {
+          emptyState.style.display =
+            list.children.length === 0 ? "block" : "none";
+        }
+        updateCount();
+      }
+    </script>
+  </body>
+</html>
